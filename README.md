@@ -1,2 +1,3 @@
 # numer0n
-numer0n web game build by antigravity
+numer0n(ヌメロン）は、かつてフジテレビ系列で深夜帯に不定期放送されていたゲームバラエティ番組。この番組のゲームをAntigravity(Gemini 3.5 Flash)を用いてWebゲームとして作成。
+単純にランダムな数字を当てるモードと、CPUとの対戦モードがあります。
