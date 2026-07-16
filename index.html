@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numer0n - サイバー・ディメンション</title>
+    <!-- Google Fonts: Orbitron (テック調) & Inter (読みやすいサンセリフ) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="scanlines"></div>
+
+    <div class="container">
+        <!-- ヘッダーエリア -->
+        <header class="header">
+            <h1 class="logo">NUMER<span class="highlight">0</span>N</h1>
+            <div class="controls">
+                <button id="sound-toggle" class="btn-icon" title="サウンドの切り替え">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button id="rule-btn" class="btn-icon" title="ルール説明">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ルールモーダル -->
+        <div id="rule-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2><i class="fas fa-info-circle"></i> ヌメロン ルール説明</h2>
+                <div class="modal-body">
+                    <p>ヌメロンは、互いに相手が決めた<strong>「重複のない3桁の数字」</strong>を当てる推理ゲームです。</p>
+                    <h3>判定ルール:</h3>
+                    <ul>
+                        <li><span class="badge eat">EAT</span> : 数字も位置も合っている場合。</li>
+                        <li><span class="badge bite">BITE</span> : 数字は合っているが、位置が違う場合。</li>
+                    </ul>
+                    <div class="example-box">
+                        <p><strong>例:</strong> 相手の数字が「<strong>123</strong>」のとき</p>
+                        <ul>
+                            <li>「<strong>1</strong>56」とコール → <strong>1 EAT - 0 BITE</strong> (「1」の位置が一致)</li>
+                            <li>「35<strong>1</strong>」とコール → <strong>0 EAT - 2 BITE</strong> (「1」と「3」が使われているが位置が違う)</li>
+                            <li>「<strong>13</strong>2」とコール → <strong>1 EAT - 2 BITE</strong> (「1」がEAT、「2」「3」がBITE)</li>
+                        </ul>
+                    </div>
+                    <h3>モード説明:</h3>
+                    <ul>
+                        <li><strong>シングルモード:</strong> CPUが決めた3桁の数字を何手で当てられるか競います。</li>
+                        <li><strong>CPU対戦モード:</strong> プレイヤーとCPUが交互に攻撃し、先に相手の3桁を当てた方が勝利します。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. セットアップ画面 (ゲーム開始前) -->
+        <section id="setup-screen" class="screen active">
+            <div class="panel glass-panel">
+                <h2 class="panel-title">ゲームモード選択</h2>
+                <div class="mode-selector">
+                    <button id="mode-single" class="btn-mode active">
+                        <i class="fas fa-user"></i>
+                        <span>シングルモード</span>
+                        <small>CPUの数字を当てる</small>
+                    </button>
+                    <button id="mode-vs" class="btn-mode">
+                        <i class="fas fa-robot"></i>
+                        <span>CPU対戦モード</span>
+                        <small>お互いに当て合う</small>
+                    </button>
+                </div>
+
+                <!-- プレイヤーの秘密数字設定 (VSモードのみ表示) -->
+                <div id="player-secret-container" class="secret-setup-container" style="display: none;">
+                    <h3 class="panel-subtitle">あなたの秘密の数字（3桁）を設定してください</h3>
+                    <div class="digit-display">
+                        <div class="digit-box" id="secret-slot-0">-</div>
+                        <div class="digit-box" id="secret-slot-1">-</div>
+                        <div class="digit-box" id="secret-slot-2">-</div>
+                    </div>
+                    
+                    <!-- 重複のない数字を入力するためのカスタムキーパッド -->
+                    <div class="keypad" id="setup-keypad">
+                        <button class="key-btn" data-val="1">1</button>
+                        <button class="key-btn" data-val="2">2</button>
+                        <button class="key-btn" data-val="3">3</button>
+                        <button class="key-btn" data-val="4">4</button>
+                        <button class="key-btn" data-val="5">5</button>
+                        <button class="key-btn" data-val="6">6</button>
+                        <button class="key-btn" data-val="7">7</button>
+                        <button class="key-btn" data-val="8">8</button>
+                        <button class="key-btn" data-val="9">9</button>
+                        <button class="key-btn btn-action" id="setup-clear">CLEAR</button>
+                        <button class="key-btn" data-val="0">0</button>
+                        <button class="key-btn btn-action" id="setup-random" title="ランダム生成"><i class="fas fa-random"></i></button>
+                    </div>
+                </div>
+
+                <div class="start-action">
+                    <button id="start-game-btn" class="btn-primary">バトル開始</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ゲームメイン画面 -->
+        <section id="game-screen" class="screen">
+            <div class="game-layout">
+                <!-- プレイヤーの操作ボード -->
+                <div class="board-column">
+                    <div class="panel glass-panel main-board">
+                        <div class="board-header">
+                            <h2 class="panel-title"><i class="fas fa-crosshairs"></i> PLAYER ATTACK</h2>
+                            <span class="turn-indicator" id="turn-badge">YOUR TURN</span>
+                        </div>
+                        
+                        <div class="input-area">
+                            <p class="input-label">コールする数字を入力</p>
+                            <div class="digit-display large">
+                                <div class="digit-box" id="guess-slot-0">-</div>
+                                <div class="digit-box" id="guess-slot-1">-</div>
+                                <div class="digit-box" id="guess-slot-2">-</div>
+                            </div>
+                            
+                            <!-- プレイヤー用アタックキーパッド -->
+                            <div class="keypad" id="game-keypad">
+                                <button class="key-btn" data-val="1">1</button>
+                                <button class="key-btn" data-val="2">2</button>
+                                <button class="key-btn" data-val="3">3</button>
+                                <button class="key-btn" data-val="4">4</button>
+                                <button class="key-btn" data-val="5">5</button>
+                                <button class="key-btn" data-val="6">6</button>
+                                <button class="key-btn" data-val="7">7</button>
+                                <button class="key-btn" data-val="8">8</button>
+                                <button class="key-btn" data-val="9">9</button>
+                                <button class="key-btn btn-action" id="game-clear">CLEAR</button>
+                                <button class="key-btn" data-val="0">0</button>
+                                <button class="key-btn btn-action btn-submit" id="game-attack" disabled>CALL</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- プレイヤー自身の状態表示 (VSモード時のみ表示) -->
+                    <div id="player-status-panel" class="panel glass-panel mini-panel" style="display: none;">
+                        <div class="status-row">
+                            <span>あなたの秘密の数字:</span>
+                            <strong class="highlight" id="player-saved-secret">***</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 对戦履歴・AIアナリティクス -->
+                <div class="board-column">
+                    <!-- ログ履歴 -->
+                    <div class="panel glass-panel history-board">
+                        <h2 class="panel-title"><i class="fas fa-history"></i> BATTLE LOG</h2>
+                        
+                        <!-- シングル用と対戦用で表示を切り替えるか、一本化する -->
+                        <div class="logs-container">
+                            <div class="log-column">
+                                <h3 class="log-title"><i class="fas fa-user-ninja"></i> あなたの攻撃</h3>
+                                <div class="log-list" id="player-log-list">
+                                    <!-- 履歴がJSで追加される -->
+                                    <div class="empty-log">コール履歴がありません</div>
+                                </div>
+                            </div>
+                            
+                            <div class="log-column" id="cpu-log-column" style="display: none;">
+                                <h3 class="log-title"><i class="fas fa-robot"></i> CPUの攻撃</h3>
+                                <div class="log-list" id="cpu-log-list">
+                                    <!-- 履歴がJSで追加される -->
+                                    <div class="empty-log">コール履歴がありません</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI分析状況パネル (VSモード時のみ表示) -->
+                    <div id="ai-analysis-panel" class="panel glass-panel mini-panel" style="display: none;">
+                        <h3 class="panel-subtitle"><i class="fas fa-brain"></i> AIの分析状況</h3>
+                        <div class="ai-status-content">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-label">
+                                    <span>推測候補の残り数: <strong id="ai-candidate-count">720</strong> / 720</span>
+                                    <span id="ai-percentage">100%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div id="ai-progress-fill" class="progress-fill" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                            <p class="ai-thought-log" id="ai-thought-text">「解析準備完了。最初の推測パターンを生成します。」</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 結果・リザルト画面 -->
+        <section id="result-screen" class="screen">
+            <div class="panel glass-panel result-panel">
+                <div class="result-header">
+                    <h2 id="result-title" class="result-title">VICTORY</h2>
+                    <p id="result-subtitle">CPUの数字を完全に解読しました！</p>
+                </div>
+
+                <div class="result-details">
+                    <div class="result-number-box">
+                        <span>CPUの数字</span>
+                        <strong class="highlight" id="cpu-secret-reveal">---</strong>
+                    </div>
+                    <div class="result-number-box" id="player-secret-reveal-box" style="display: none;">
+                        <span>あなたの数字</span>
+                        <strong class="highlight" id="player-secret-reveal">---</strong>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">経過ターン</span>
+                        <span class="stat-val" id="stat-turns">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">プレイ時間</span>
+                        <span class="stat-val" id="stat-time">-</span>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button id="restart-btn" class="btn-primary">もう一度プレイ</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 効果音再生のための要素 (Web Audio API を使用するため必須ではないが、代替用などの定義は不要) -->
+    <script src="script.js"></script>
+</body>
+</html>

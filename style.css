@@ -1,0 +1,932 @@
+/* ==========================================================================
+   Numer0n - サイバー・ディメンション スタイルシート
+   ========================================================================== */
+
+/* 変数定義とデザインシステム */
+:root {
+    --bg-dark: #07080d;
+    --bg-panel: rgba(14, 18, 30, 0.75);
+    --bg-panel-hover: rgba(20, 26, 45, 0.85);
+    --color-primary: #00ff66;       /* EAT / メインテーマ (ネオングリーン) */
+    --color-secondary: #00f0ff;     /* BITE / アシスト (ネオンブルー) */
+    --color-accent: #ff0055;        /* 警告 / CPU (ネオンピンク) */
+    --color-warning: #ffcc00;       /* 注意 (ネオンイエロー) */
+    --color-text: #e2e8f0;
+    --color-text-muted: #64748b;
+    --color-text-highlight: #ffffff;
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-tech: 'Orbitron', 'Share Tech Mono', monospace;
+    --glow-primary: 0 0 10px rgba(0, 255, 102, 0.5), 0 0 20px rgba(0, 255, 102, 0.2);
+    --glow-secondary: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.2);
+    --glow-accent: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.2);
+    --border-glow: 1px solid rgba(0, 240, 255, 0.25);
+    --border-glow-active: 1px solid rgba(0, 255, 102, 0.6);
+    --transition-speed: 0.3s;
+}
+
+/* リセット & ベース */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--color-text);
+    font-family: var(--font-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* 背景エフェクト: サイバーグリッド */
+.cyber-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(18, 24, 45, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(18, 24, 45, 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center center;
+    z-index: -2;
+    transform: perspective(500px) rotateX(60deg) translateY(-30%);
+    transform-origin: top center;
+    animation: grid-scroll 24s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes grid-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 1000px; }
+}
+
+/* 背景エフェクト: CRTスキャンライン */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+/* メインコンテナ */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ヘッダー */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0 25px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 20px;
+}
+
+.logo {
+    font-family: var(--font-tech);
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.logo .highlight {
+    color: var(--color-primary);
+    text-shadow: var(--glow-primary);
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+}
+
+/* ボタンの共通スタイル */
+.btn-icon {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.btn-icon:hover {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+    box-shadow: var(--glow-secondary);
+    transform: translateY(-2px);
+}
+
+/* モーダル */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(7, 8, 13, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+}
+
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background: var(--bg-panel);
+    border: var(--border-glow);
+    box-shadow: var(--glow-secondary);
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    padding: 30px;
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: modal-slide-in 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes modal-slide-in {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    color: var(--color-text-muted);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color var(--transition-speed) ease;
+}
+
+.close-btn:hover {
+    color: var(--color-accent);
+}
+
+.modal h2 {
+    font-family: var(--font-tech);
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(0, 240, 255, 0.3);
+    padding-bottom: 10px;
+    color: var(--color-secondary);
+}
+
+.modal-body {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.modal-body p {
+    margin-bottom: 15px;
+}
+
+.modal-body h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.modal-body ul {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.modal-body li {
+    margin-bottom: 8px;
+}
+
+.example-box {
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 4px solid var(--color-secondary);
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+}
+
+/* バッジ */
+.badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-family: var(--font-tech);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.badge.eat {
+    background: rgba(0, 255, 102, 0.15);
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    text-shadow: var(--glow-primary);
+}
+
+.badge.bite {
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid var(--color-secondary);
+    color: var(--color-secondary);
+    text-shadow: var(--glow-secondary);
+}
+
+/* パネル (ガラスモフィズム) */
+.glass-panel {
+    background: var(--bg-panel);
+    border: var(--border-glow);
+    border-radius: 16px;
+    padding: 30px;
+    backdrop-filter: blur(12px);
+    transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.glass-panel:hover {
+    background: var(--bg-panel-hover);
+}
+
+.panel-title {
+    font-family: var(--font-tech);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.panel-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--color-text);
+}
+
+/* 画面切り替えの仕組み */
+.screen {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.screen.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 1. セットアップ画面のスタイル */
+#setup-screen .panel {
+    max-width: 650px;
+    margin: 40px auto;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.mode-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 35px;
+}
+
+.btn-mode {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 25px 15px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn-mode i {
+    font-size: 2.2rem;
+    transition: transform var(--transition-speed) ease;
+}
+
+.btn-mode span {
+    font-family: var(--font-tech);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--color-text);
+}
+
+.btn-mode small {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.btn-mode:hover {
+    border-color: rgba(0, 240, 255, 0.4);
+    background: rgba(0, 240, 255, 0.03);
+    color: var(--color-secondary);
+}
+
+.btn-mode:hover i {
+    transform: scale(1.1);
+}
+
+.btn-mode.active {
+    border-color: var(--color-primary);
+    background: rgba(0, 255, 102, 0.06);
+    color: var(--color-primary);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.15);
+}
+
+.btn-mode.active span {
+    color: var(--color-primary);
+}
+
+/* 秘密の数字設定エリア */
+.secret-setup-container {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    animation: fade-slide-up 0.4s ease forwards;
+}
+
+@keyframes fade-slide-up {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* デジタル表示窓 */
+.digit-display {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.digit-box {
+    width: 60px;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.5);
+    border: var(--border-glow);
+    border-radius: 10px;
+    font-family: var(--font-tech);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.digit-box.filled {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    text-shadow: var(--glow-primary);
+    box-shadow: inset 0 0 10px rgba(0, 255, 102, 0.2);
+}
+
+.digit-display.large .digit-box {
+    width: 80px;
+    height: 105px;
+    font-size: 3.5rem;
+}
+
+/* キーパッド */
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 280px;
+    margin: 0 auto;
+}
+
+.key-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-family: var(--font-tech);
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.key-btn:hover:not(:disabled) {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+}
+
+.key-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.key-btn:disabled {
+    opacity: 0.15;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.01);
+    border-color: transparent;
+}
+
+.key-btn.btn-action {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+}
+
+.key-btn.btn-action:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+}
+
+.key-btn.btn-submit {
+    color: var(--color-primary);
+    border-color: rgba(0, 255, 102, 0.3);
+}
+
+.key-btn.btn-submit:hover:not(:disabled) {
+    background: rgba(0, 255, 102, 0.15);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: var(--glow-primary);
+}
+
+/* プライマリボタン */
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #00bbff 100%);
+    border: none;
+    color: var(--bg-dark);
+    font-family: var(--font-tech);
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    padding: 15px 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 255, 102, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 255, 102, 0.5), 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+.btn-primary:active {
+    transform: translateY(-1px);
+}
+
+.start-action {
+    margin-top: 30px;
+}
+
+/* 2. ゲーム画面のスタイル */
+.game-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 25px;
+}
+
+.board-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.main-board {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 15px;
+}
+
+.turn-indicator {
+    font-family: var(--font-tech);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-muted);
+}
+
+.turn-indicator.active {
+    background: rgba(0, 255, 102, 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: var(--glow-primary);
+    animation: pulse 1.5s infinite;
+}
+
+.turn-indicator.cpu-active {
+    background: rgba(255, 0, 85, 0.1);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: var(--glow-accent);
+    animation: pulse-accent 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.8; box-shadow: 0 0 5px rgba(0, 255, 102, 0.3); }
+    50% { opacity: 1; box-shadow: 0 0 15px rgba(0, 255, 102, 0.6); }
+    100% { opacity: 0.8; box-shadow: 0 0 5px rgba(0, 255, 102, 0.3); }
+}
+
+@keyframes pulse-accent {
+    0% { opacity: 0.8; box-shadow: 0 0 5px rgba(255, 0, 85, 0.3); }
+    50% { opacity: 1; box-shadow: 0 0 15px rgba(255, 0, 85, 0.6); }
+    100% { opacity: 0.8; box-shadow: 0 0 5px rgba(255, 0, 85, 0.3); }
+}
+
+.input-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 10px 0;
+}
+
+.input-label {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    letter-spacing: 1px;
+}
+
+/* ミニパネル */
+.mini-panel {
+    padding: 15px 20px;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.status-row strong {
+    font-family: var(--font-tech);
+    font-size: 1.3rem;
+}
+
+.highlight {
+    color: var(--color-secondary);
+    text-shadow: var(--glow-secondary);
+}
+
+/* 履歴・タイムライン */
+.history-board {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.logs-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* VSモード時は2カラムにする */
+.vs-mode-layout .logs-container {
+    grid-template-columns: 1fr 1fr;
+}
+
+.log-column {
+    display: flex;
+    flex-direction: column;
+    height: 320px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.log-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.log-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* スクロールバー装飾 */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 240, 255, 0.3);
+}
+
+.empty-log {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 30px;
+    font-style: italic;
+}
+
+/* ログ行項目 */
+.log-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 8px 12px;
+    animation: log-slide-in 0.3s ease-out forwards;
+}
+
+@keyframes log-slide-in {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.log-turn {
+    font-family: var(--font-tech);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    width: 35px;
+}
+
+.log-guess {
+    font-family: var(--font-tech);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+}
+
+.log-result {
+    display: flex;
+    gap: 5px;
+}
+
+/* AI進捗状況 */
+.progress-bar-container {
+    margin-bottom: 12px;
+}
+
+.progress-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+}
+
+.progress-bar-label strong {
+    color: var(--color-secondary);
+}
+
+.progress-track {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-primary));
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+    transition: width 0.5s ease;
+}
+
+.ai-thought-log {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 240, 255, 0.1);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    color: var(--color-secondary);
+    font-family: monospace;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+}
+
+/* 3. 結果画面のスタイル */
+#result-screen .result-panel {
+    max-width: 550px;
+    margin: 50px auto;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.result-title {
+    font-family: var(--font-tech);
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+}
+
+.result-panel.victory .result-title {
+    color: var(--color-primary);
+    text-shadow: var(--glow-primary);
+}
+
+.result-panel.defeat .result-title {
+    color: var(--color-accent);
+    text-shadow: var(--glow-accent);
+}
+
+#result-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 30px;
+}
+
+.result-details {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.result-number-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: var(--border-glow);
+    padding: 15px 25px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-width: 150px;
+}
+
+.result-number-box span {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    letter-spacing: 1px;
+}
+
+.result-number-box strong {
+    font-family: var(--font-tech);
+    font-size: 2rem;
+    letter-spacing: 4px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.stat-val {
+    font-family: var(--font-tech);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.result-actions {
+    margin-top: 20px;
+}
+
+/* モバイルレスポンシブデザイン */
+@media (max-width: 900px) {
+    .game-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .digit-display.large .digit-box {
+        width: 65px;
+        height: 85px;
+        font-size: 2.8rem;
+    }
+
+    .keypad {
+        max-width: 320px;
+    }
+
+    .vs-mode-layout .logs-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .log-column {
+        height: 240px;
+    }
+}
+
+@media (max-width: 500px) {
+    .mode-selector {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .logo {
+        font-size: 1.8rem;
+    }
+
+    .result-title {
+        font-size: 2.2rem;
+    }
+
+    .result-details {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+}
