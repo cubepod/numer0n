@@ -50,10 +50,15 @@
                             <li>「<strong>13</strong>2」とコール → <strong>1 EAT - 2 BITE</strong> (「1」がEAT、「2」「3」がBITE)</li>
                         </ul>
                     </div>
-                    <h3>モード説明:</h3>
+                    <h3>アイテムルール:</h3>
+                    <p>対戦モードでは、ゲーム開始前に「攻撃」「防御」のアイテムを1つずつ選択して持ち込みます。それぞれゲーム中1回のみ、アタック前に使用できます。</p>
                     <ul>
-                        <li><strong>シングルモード:</strong> CPUが決めた3桁の数字を何手で当てられるか競います。</li>
-                        <li><strong>CPU対戦モード:</strong> プレイヤーとCPUが交互に攻撃し、先に相手の3桁を当てた方が勝利します。</li>
+                        <li><strong>DOUBLE (ダブル) [攻撃]:</strong> 1ターンに2回連続攻撃。ただし代償として、相手が指定した自分の1桁が開示されます。</li>
+                        <li><strong>HIGH & LOW [攻撃]:</strong> 相手の各桁の数字が HIGH(5-9) か LOW(0-4) かを開示させます。</li>
+                        <li><strong>TARGET [攻撃]:</strong> 指定した数字が相手の3桁に含まれるか、含まれる場合はどの桁かを開示させます。</li>
+                        <li><strong>SLASH [攻撃]:</strong> 相手の数字の「最大値」から「最小値」を引いた差（スラッシュナンバー）を開示させます。</li>
+                        <li><strong>SHUFFLE (シャッフル) [防御]:</strong> 自分の数字の並び順をシャッフルします。元の位置と変わらない場合もあります。</li>
+                        <li><strong>CHANGE (チェンジ) [防御]:</strong> 自分の任意の1桁を別の数字に変更します。ただし、HIGHは別のHIGH、LOWは別のLOWとのみ変更可能です。</li>
                     </ul>
                 </div>
             </div>
@@ -102,6 +107,66 @@
                     </div>
                 </div>
 
+                <!-- アイテム選択セクション (VSモードのみ表示) -->
+                <div id="item-setup-container" class="item-setup-container" style="display: none;">
+                    <h3 class="panel-subtitle">バトルに持ち込むアイテムを選択してください</h3>
+                    <div class="item-select-grid">
+                        <div class="item-select-group">
+                            <h4 class="item-group-title"><i class="fas fa-crosshairs"></i> 攻撃系アイテム (1つ選択)</h4>
+                            <div class="item-options">
+                                <label class="item-option-card">
+                                    <input type="radio" name="atk-item" value="double" checked>
+                                    <div class="item-card-inner">
+                                        <span class="item-opt-name">DOUBLE</span>
+                                        <span class="item-opt-desc">2回連続攻撃 / 1桁開示の代償</span>
+                                    </div>
+                                </label>
+                                <label class="item-option-card">
+                                    <input type="radio" name="atk-item" value="high-low">
+                                    <div class="item-card-inner">
+                                        <span class="item-opt-name">HIGH & LOW</span>
+                                        <span class="item-opt-desc">相手の各桁のHIGH/LOWを判明</span>
+                                    </div>
+                                </label>
+                                <label class="item-option-card">
+                                    <input type="radio" name="atk-item" value="target">
+                                    <div class="item-card-inner">
+                                        <span class="item-opt-name">TARGET</span>
+                                        <span class="item-opt-desc">指定した数字の有無と桁を特定</span>
+                                    </div>
+                                </label>
+                                <label class="item-option-card">
+                                    <input type="radio" name="atk-item" value="slash">
+                                    <div class="item-card-inner">
+                                        <span class="item-opt-name">SLASH</span>
+                                        <span class="item-opt-desc">相手の最大値 - 最小値の差を判明</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="item-select-group">
+                            <h4 class="item-group-title"><i class="fas fa-shield-halved"></i> 防御系アイテム (1つ選択)</h4>
+                            <div class="item-options">
+                                <label class="item-option-card">
+                                    <input type="radio" name="def-item" value="shuffle" checked>
+                                    <div class="item-card-inner">
+                                        <span class="item-opt-name">SHUFFLE</span>
+                                        <span class="item-opt-desc">自分の3桁の並び順を入れ替える</span>
+                                    </div>
+                                </label>
+                                <label class="item-option-card">
+                                    <input type="radio" name="def-item" value="change">
+                                    <div class="item-card-inner">
+                                        <span class="item-opt-name">CHANGE</span>
+                                        <span class="item-opt-desc">任意の1桁を別の数に入れ替える</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="start-action">
                     <button id="start-game-btn" class="btn-primary">バトル開始</button>
                 </div>
@@ -143,6 +208,23 @@
                                 <button class="key-btn btn-action btn-submit" id="game-attack" disabled>CALL</button>
                             </div>
                         </div>
+
+                        <!-- プレイヤーのアイテム所持・使用欄 -->
+                        <div id="player-item-section" class="item-section" style="display: none;">
+                            <p class="input-label">所持アイテム (各1回使用可能)</p>
+                            <div class="item-buttons-container">
+                                <button id="btn-use-atk" class="btn-item btn-atk-color">
+                                    <i class="fas fa-bolt"></i>
+                                    <span class="item-name">DOUBLE</span>
+                                    <span class="item-type-label">ATTACK</span>
+                                </button>
+                                <button id="btn-use-def" class="btn-item btn-def-color">
+                                    <i class="fas fa-shield-halved"></i>
+                                    <span class="item-name">SHUFFLE</span>
+                                    <span class="item-type-label">DEFENSE</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- プレイヤー自身の状態表示 (VSモード時のみ表示) -->
@@ -154,18 +236,41 @@
                     </div>
                 </div>
 
-                <!-- 对戦履歴・AIアナリティクス -->
+                <!-- 対戦履歴・AIアナリティクス -->
                 <div class="board-column">
+                    <!-- インテルメモ（開示情報まとめ） (VSモード時のみ表示) -->
+                    <div id="intel-panel" class="panel glass-panel mini-panel" style="display: none;">
+                        <h3 class="panel-subtitle"><i class="fas fa-eye"></i> INTEL MEMO (獲得情報)</h3>
+                        <div class="intel-grid">
+                            <div class="intel-card">
+                                <span>CPUのHIGH/LOW:</span>
+                                <div class="intel-hl-display" id="intel-hl-reveal">
+                                    <span class="badge hl-badge">-</span>
+                                    <span class="badge hl-badge">-</span>
+                                    <span class="badge hl-badge">-</span>
+                                </div>
+                            </div>
+                            <div class="intel-card">
+                                <span>SLASH NUMBER:</span>
+                                <strong class="intel-val" id="intel-slash-val">-</strong>
+                            </div>
+                            <div class="intel-card full-width">
+                                <span>特定済みのターゲット:</span>
+                                <div class="intel-target-list" id="intel-target-list">
+                                    <span class="empty-intel">なし</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ログ履歴 -->
                     <div class="panel glass-panel history-board">
                         <h2 class="panel-title"><i class="fas fa-history"></i> BATTLE LOG</h2>
                         
-                        <!-- シングル用と対戦用で表示を切り替えるか、一本化する -->
                         <div class="logs-container">
                             <div class="log-column">
                                 <h3 class="log-title"><i class="fas fa-user-ninja"></i> あなたの攻撃</h3>
                                 <div class="log-list" id="player-log-list">
-                                    <!-- 履歴がJSで追加される -->
                                     <div class="empty-log">コール履歴がありません</div>
                                 </div>
                             </div>
@@ -173,7 +278,6 @@
                             <div class="log-column" id="cpu-log-column" style="display: none;">
                                 <h3 class="log-title"><i class="fas fa-robot"></i> CPUの攻撃</h3>
                                 <div class="log-list" id="cpu-log-list">
-                                    <!-- 履歴がJSで追加される -->
                                     <div class="empty-log">コール履歴がありません</div>
                                 </div>
                             </div>
@@ -237,7 +341,20 @@
         </section>
     </div>
 
-    <!-- 効果音再生のための要素 (Web Audio API を使用するため必須ではないが、代替用などの定義は不要) -->
+    <!-- インタラクティブアクションオーバーレイ -->
+    <div id="action-overlay" class="action-overlay" style="display: none;">
+        <div class="action-dialog glass-panel">
+            <h3 id="action-dialog-title">アクション選択</h3>
+            <p id="action-dialog-desc">必要な情報を選択してください。</p>
+            <div id="action-dialog-content">
+                <!-- JSでコンテンツを動的に差し込み -->
+            </div>
+            <div class="action-dialog-actions" id="action-dialog-actions">
+                <button id="action-cancel-btn" class="btn-secondary">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
